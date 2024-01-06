@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "577463655266",
+    "project_id": "hckim-flutter-web-portfolio",
+    "storage_bucket": "hckim-flutter-web-portfolio.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577463655266:android:9fdd63b6651d0104272a3b",
+        "android_client_info": {
+          "package_name": "com.example.flutter_web_portfolio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD74C7DlYIH60wLvcLiOtllpAK4VudHcCs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
