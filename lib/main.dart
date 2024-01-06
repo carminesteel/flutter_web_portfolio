@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/common/fonts.dart';
+import 'package:flutter_web_portfolio/components/common/mouse_coordinator.dart';
 import 'package:flutter_web_portfolio/constants/file_path.dart';
 import 'package:flutter_web_portfolio/firebase_options.dart';
 
@@ -36,6 +37,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final GlobalKey profileImageKey = GlobalKey();
+
+  // firebase 구현필요
   final db = FirebaseFirestore.instance;
 
   final user = <String, dynamic>{
@@ -67,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Image.asset(
               '$PHOTO/main_profile.jpg',
+              key: profileImageKey,
               fit: BoxFit.contain,
               width: 1600 / 2,
               height: 900 / 2,
@@ -77,6 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     (DocumentReference doc) =>
                         print('DocumentSnapshot added with ID: ${doc.id}'));
               },
+            ),
+            MouseCoordinator(
+              childKey: profileImageKey,
             )
           ],
         ),
