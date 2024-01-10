@@ -15,6 +15,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   // firebase 구현필요
+  //////////////////////////////////////////////////////////////////////////////
   final db = FirebaseFirestore.instance;
 
   final user = <String, dynamic>{
@@ -22,6 +23,7 @@ class _MainPageState extends State<MainPage> {
     "last": "Lovelace",
     "born": 1815
   };
+  //////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
