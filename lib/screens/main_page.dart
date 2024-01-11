@@ -14,6 +14,9 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  Size get screen => MediaQuery.of(context).size;
+  bool clicked = false;
+
   // firebase 구현필요
   //////////////////////////////////////////////////////////////////////////////
   final db = FirebaseFirestore.instance;
@@ -25,36 +28,67 @@ class _MainPageState extends State<MainPage> {
   };
   //////////////////////////////////////////////////////////////////////////////
 
+  _textfield() {
+    return TextField(
+      onSubmitted: (value) async {
+        await db.collection("textfield").add({"value": "$value"}).then(
+            (DocumentReference doc) =>
+                print('DocumentSnapshot added with ID: ${doc.id}'));
+      },
+    );
+  }
+
+  Widget _title() {
+    return Padding(
+      padding: EdgeInsets.only(top: 70),
+      child: Row(
+        children: [
+          SelectableText(
+            'Flutter & Dart',
+          ),
+          SelectableText(
+            '개발자 김홍철입니다. :)',
+            style: CustomFont.noto,
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Row(
+      body: Container(
+        width: screen.width,
+        height: screen.height,
+        child: Stack(
           children: [
-            SelectableText(
-              'Flutter & Dart',
-            ),
-            SelectableText(
-              '개발자 김홍철입니다. :)',
-              style: CustomFont.noto,
+            Positioned.fill(
+                child: Container(
+              color: Colors.white,
+            )),
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 300),
+              onEnd: () {},
+              curve: Curves.easeOutCirc,
+              left: clicked ? 120 : 600,
+              top: clicked ? 100 : 300,
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        clicked = !clicked;
+                      });
+                    },
+                    child: Center(
+                      child: InteractiveWidget(),
+                    ),
+                  ),
+                  _title()
+                ],
+              ),
             )
-          ],
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            InteractiveWidget(),
-            // InteractiveWidget(globalKey: _profileImageKey),
-            TextField(
-              onSubmitted: (value) async {
-                await db.collection("textfield").add({"value": "$value"}).then(
-                    (DocumentReference doc) =>
-                        print('DocumentSnapshot added with ID: ${doc.id}'));
-              },
-            ),
           ],
         ),
       ),

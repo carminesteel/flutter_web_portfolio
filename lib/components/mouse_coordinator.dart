@@ -26,6 +26,9 @@ class MouseCoordinator extends StatefulWidget {
 class _MouseCoordinatorState extends State<MouseCoordinator> {
   void _updateLocation(PointerEvent details) {
     widget.onPositionChange(details.position);
+    if (widget.onMouseHover != null) {
+      widget.onMouseHover!();
+    }
   }
 
   @override
@@ -38,26 +41,7 @@ class _MouseCoordinatorState extends State<MouseCoordinator> {
           widget.onExit!();
         }
       },
-      child: GestureDetector(
-        onLongPressDown: (details) {
-          if (widget.onExit != null) {
-            widget.onExit!();
-          }
-        },
-        onLongPress: () {
-          if (widget.onLongPress != null) {
-            widget.onLongPress!();
-          }
-          easyLog('longPress!');
-        },
-        onLongPressUp: () {
-          print('onLongPressUp');
-          if (widget.onLongPressUp != null) {
-            widget.onLongPressUp!();
-          }
-        },
-        child: widget.child,
-      ),
+      child: widget.child,
     );
   }
 }

@@ -23,7 +23,28 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
   Offset _widgetCenterOffset = const Offset(0, 0);
   late final AnimationController _animController;
   late Animation<double> _scaleAnim;
+  late Animation<double> _shrinkAnim;
+  late Animation<double> _currentAnim;
   Curve curve = Curves.easeOutCirc;
+
+  void _initAnimationController() {
+    _animController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+
+    _scaleAnim = Tween(
+      begin: 1.0,
+      end: 0.8,
+    ).animate(
+        CurvedAnimation(parent: _animController, curve: Curves.easeOutCirc));
+
+    _shrinkAnim = Tween(
+      begin: _scaleAnim.value,
+      end: 0.8,
+    ).animate(
+        CurvedAnimation(parent: _animController, curve: Curves.easeInCirc));
+
+    _currentAnim = _scaleAnim;
+  }
 
   void _setCenterOffset() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -33,16 +54,23 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
     });
   }
 
-  void _onReset() {
+  void _onExit() {
     setState(() {
       x = 0;
       y = 0;
       z = 0;
     });
+    _onLongPressUp();
   }
 
-  void _onLongPress() {
-    _animController.forward();
+  void _onHover() async {
+    _currentAnim = _scaleAnim;
+    await _animController.forward();
+  }
+
+  void _onLongPressUp() async {
+    _currentAnim = _shrinkAnim;
+    await _animController.reverse();
   }
 
   @override
@@ -50,15 +78,7 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
     WidgetsBinding.instance.addObserver(this);
 
     // animtaion controller
-    _animController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
-
-    // scale tween
-    _scaleAnim = Tween(
-      begin: 1.0,
-      end: 0.75,
-    ).animate(
-        CurvedAnimation(parent: _animController, curve: Curves.easeOutCirc));
+    _initAnimationController();
 
     _setCenterOffset();
 
@@ -80,22 +100,8 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
   @override
   Widget build(BuildContext context) {
     return MouseCoordinator(
-      onExit: _onReset,
-      onLongPress: _onLongPress,
-      onLongPressUp: () async {
-        _scaleAnim = Tween(
-          begin: 1.0,
-          end: 0.75,
-        ).animate(
-            CurvedAnimation(parent: _animController, curve: Curves.easeInCirc));
-
-        await _animController.reverse();
-        _scaleAnim = Tween(
-          begin: 1.0,
-          end: 0.75,
-        ).animate(CurvedAnimation(
-            parent: _animController, curve: Curves.easeOutCirc));
-      },
+      onMouseHover: _onHover,
+      onExit: _onExit,
       onPositionChange: (offset) {
         setState(() {
           if (_profileImageKey.globalPaintBounds != null) {
@@ -115,7 +121,7 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
               //
               0, 0, 1, -0.001,
               //
-              0, 0, 0, _scaleAnim.value,
+              0, 0, 0, _currentAnim.value,
               //
             )
               ..rotateX(x)
@@ -128,8 +134,8 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
                 '$PHOTO/main_profile.jpg',
                 key: _profileImageKey,
                 fit: BoxFit.contain,
-                width: 1600 / 2,
-                height: 900 / 2,
+                width: 1600 / 2.5,
+                height: 900 / 2.5,
               ),
             ),
           );
