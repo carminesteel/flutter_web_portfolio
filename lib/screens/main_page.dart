@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/common/fonts.dart';
+import 'package:flutter_web_portfolio/common/utils.dart';
 import 'package:flutter_web_portfolio/components/interactive_widget.dart';
 import 'package:flutter_web_portfolio/components/mouse_coordinator.dart';
 
@@ -13,9 +14,16 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   Size get screen => MediaQuery.of(context).size;
   bool clicked = false;
+  GlobalKey profileImageKey = GlobalKey();
+  Offset _widgetCenterOffset = const Offset(0, 0);
+
+  double x = 0;
+  double y = 0;
+  bool isHover = false;
 
   // firebase 구현필요
   //////////////////////////////////////////////////////////////////////////////
@@ -55,6 +63,34 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  void _setCenterOffset() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (profileImageKey.globalPaintBounds != null) {
+        _widgetCenterOffset = profileImageKey.globalPaintBounds!.center;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    _setCenterOffset();
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    _setCenterOffset();
+    super.didChangeMetrics();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,32 +99,41 @@ class _MainPageState extends State<MainPage> {
         height: screen.height,
         child: Stack(
           children: [
-            Positioned.fill(
-                child: Container(
-              color: Colors.white,
-            )),
-            AnimatedPositioned(
+            Positioned(
+                child: Center(
+                    child: AnimatedScale(
+              scale: isHover ? 1.2 : 1.0,
               duration: Duration(milliseconds: 300),
-              onEnd: () {},
-              curve: Curves.easeOutCirc,
-              left: clicked ? 120 : 600,
-              top: clicked ? 100 : 300,
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        clicked = !clicked;
-                      });
-                    },
-                    child: Center(
-                      child: InteractiveWidget(),
-                    ),
-                  ),
-                  _title()
-                ],
+              curve: Curves.easeOutCubic,
+              child: InteractiveWidget(
+                x: x,
+                y: y,
+                profileImageKey: profileImageKey,
               ),
-            )
+            ))),
+            Positioned.fill(
+                child: MouseCoordinator(
+              onMouseHover: () {
+                if (x.abs() < 0.2 && y.abs() < 0.2) {
+                  setState(() {
+                    isHover = true;
+                  });
+                } else {
+                  setState(() {
+                    isHover = false;
+                  });
+                }
+              },
+              onPositionChange: (offset) {
+                setState(() {
+                  x = ((_widgetCenterOffset - offset).dy) / 1000;
+                  y = ((_widgetCenterOffset - offset).dx) / 1000;
+                });
+              },
+              child: Container(
+                color: Colors.transparent,
+              ),
+            )),
           ],
         ),
       ),

@@ -4,17 +4,22 @@ import 'package:flutter_web_portfolio/constants/file_path.dart';
 
 class InteractiveWidget extends StatefulWidget {
   const InteractiveWidget({
+    required this.profileImageKey,
+    required this.x,
+    required this.y,
     super.key,
   });
+
+  final GlobalKey profileImageKey;
+  final double x;
+  final double y;
 
   @override
   State<InteractiveWidget> createState() => _InteractiveWidgetState();
 }
 
 class _InteractiveWidgetState extends State<InteractiveWidget>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
-  final GlobalKey _profileImageKey = GlobalKey();
-
+    with SingleTickerProviderStateMixin {
   double x = 0;
   double y = 0;
   double z = 0;
@@ -46,100 +51,64 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
     _currentAnim = _scaleAnim;
   }
 
-  void _setCenterOffset() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (_profileImageKey.globalPaintBounds != null) {
-        _widgetCenterOffset = _profileImageKey.globalPaintBounds!.center;
-      }
-    });
-  }
-
   void _onExit() {
     setState(() {
       x = 0;
       y = 0;
       z = 0;
     });
-    _onLongPressUp();
+    // _onLongPressUp();
   }
 
-  void _onHover() async {
-    _currentAnim = _scaleAnim;
-    await _animController.forward();
-  }
+  // void _onHover() async {
+  //   _currentAnim = _scaleAnim;
+  //   await _animController.forward();
+  // }
+  //
+  // void _onLongPressUp() async {
+  //   _currentAnim = _shrinkAnim;
+  //   await _animController.reverse();
+  // }
 
-  void _onLongPressUp() async {
-    _currentAnim = _shrinkAnim;
-    await _animController.reverse();
+  @override
+  void didUpdateWidget(covariant InteractiveWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
-
     // animtaion controller
     _initAnimationController();
-
-    _setCenterOffset();
 
     super.initState();
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeMetrics() {
-    _setCenterOffset();
-    super.didChangeMetrics();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MouseCoordinator(
-      onMouseHover: _onHover,
-      onExit: _onExit,
-      onPositionChange: (offset) {
-        setState(() {
-          if (_profileImageKey.globalPaintBounds != null) {
-            x = ((_widgetCenterOffset - offset).dy) / 1000;
-            y = ((_widgetCenterOffset - offset).dx) / 1000;
-          }
-        });
-      },
-      child: AnimatedBuilder(
-        animation: _animController,
-        builder: (context, child) {
-          return Transform(
-            transform: Matrix4(
-              1, 0, 0, 0,
-              //
-              0, 1, 0, 0,
-              //
-              0, 0, 1, -0.001,
-              //
-              0, 0, 0, _currentAnim.value,
-              //
-            )
-              ..rotateX(x)
-              ..rotateY(-y)
-              ..rotateZ(z),
-            alignment: FractionalOffset.center,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                '$PHOTO/main_profile.jpg',
-                key: _profileImageKey,
-                fit: BoxFit.contain,
-                width: 1600 / 2.5,
-                height: 900 / 2.5,
-              ),
-            ),
-          );
-        },
+    return Transform(
+      transform: Matrix4(
+        1, 0, 0, 0,
+        //
+        0, 1, 0, 0,
+        //
+        0, 0, 1, -0.001,
+        //
+        0, 0, 0, _currentAnim.value,
+        //
+      )
+        ..rotateX(widget.x)
+        ..rotateY(-(widget.y))
+        ..rotateZ(z),
+      alignment: FractionalOffset.center,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Image.asset(
+          '$PHOTO/main_profile.jpg',
+          key: widget.profileImageKey,
+          fit: BoxFit.contain,
+          width: 1600 / 2.5,
+          height: 900 / 2.5,
+        ),
       ),
     );
   }
