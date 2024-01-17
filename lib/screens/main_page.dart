@@ -94,48 +94,33 @@ class _MainPageState extends State<MainPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: screen.width,
-        height: screen.height,
-        child: Stack(
-          children: [
-            Positioned(
-                child: Center(
-                    child: AnimatedScale(
-              scale: isHover ? 1.2 : 1.0,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              child: InteractiveWidget(
-                x: x,
-                y: y,
-                profileImageKey: profileImageKey,
-              ),
-            ))),
-            Positioned.fill(
-                child: MouseCoordinator(
-              onMouseHover: () {
-                if (x.abs() < 0.2 && y.abs() < 0.2) {
-                  setState(() {
-                    isHover = true;
-                  });
-                } else {
-                  setState(() {
-                    isHover = false;
-                  });
-                }
-              },
-              onPositionChange: (offset) {
-                setState(() {
-                  x = ((_widgetCenterOffset - offset).dy) / 1000;
-                  y = ((_widgetCenterOffset - offset).dx) / 1000;
-                });
-              },
-              child: Container(
-                color: Colors.transparent,
-              ),
-            )),
-          ],
-        ),
+      body: MouseCoordinator(
+        onMouseHover: () {
+          if (x.abs() < 0.2 && y.abs() < 0.2) {
+            setState(() {
+              isHover = true;
+            });
+          } else {
+            setState(() {
+              isHover = false;
+            });
+          }
+        },
+        onPositionChange: (offset) {
+          x = ((_widgetCenterOffset - offset).dy) / 1000;
+          y = ((_widgetCenterOffset - offset).dx) / 1000;
+        },
+        child: Center(
+            child: AnimatedScale(
+          scale: isHover ? 1.2 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          child: InteractiveWidget(
+            x: x,
+            y: y,
+            profileImageKey: profileImageKey,
+          ),
+        )),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

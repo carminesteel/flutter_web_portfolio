@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/components/mouse_coordinator.dart';
 import 'package:flutter_web_portfolio/constants/file_path.dart';
@@ -20,96 +22,105 @@ class InteractiveWidget extends StatefulWidget {
 
 class _InteractiveWidgetState extends State<InteractiveWidget>
     with SingleTickerProviderStateMixin {
-  double x = 0;
-  double y = 0;
-  double z = 0;
-  double scale = 1;
+  bool isTriggered = false;
 
-  Offset _widgetCenterOffset = const Offset(0, 0);
-  late final AnimationController _animController;
-  late Animation<double> _scaleAnim;
-  late Animation<double> _shrinkAnim;
-  late Animation<double> _currentAnim;
-  Curve curve = Curves.easeOutCirc;
+  //controller
+  late final AnimationController _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 1000,
+      ));
 
-  void _initAnimationController() {
-    _animController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+  //spin 애니메이션
+  late final rotate = Tween<double>(begin: 0, end: 3.14).animate(
+    CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(
+        0,
+        0.5,
+        curve: Curves.easeOutCubic,
+      ),
+      reverseCurve: const Interval(
+        0.5,
+        1,
+        curve: Curves.easeInCubic,
+      ),
+    ),
+  );
 
-    _scaleAnim = Tween(
-      begin: 1.0,
-      end: 0.8,
-    ).animate(
-        CurvedAnimation(parent: _animController, curve: Curves.easeOutCirc));
-
-    _shrinkAnim = Tween(
-      begin: _scaleAnim.value,
-      end: 0.8,
-    ).animate(
-        CurvedAnimation(parent: _animController, curve: Curves.easeInCirc));
-
-    _currentAnim = _scaleAnim;
-  }
-
-  void _onExit() {
-    setState(() {
-      x = 0;
-      y = 0;
-      z = 0;
-    });
-    // _onLongPressUp();
-  }
-
-  // void _onHover() async {
-  //   _currentAnim = _scaleAnim;
-  //   await _animController.forward();
-  // }
-  //
-  // void _onLongPressUp() async {
-  //   _currentAnim = _shrinkAnim;
-  //   await _animController.reverse();
-  // }
-
-  @override
-  void didUpdateWidget(covariant InteractiveWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
+  //width 애니메이션
+  // late final expandWidth =
+  //     Tween<double>(begin: 1600 / 2.5, end: MediaQuery.of(context).size.width)
+  //         .animate(
+  //   CurvedAnimation(
+  //       parent: _animationController,
+  //       curve: const Interval(
+  //         0.250,
+  //         0.500,
+  //         curve: Curves.easeOutCubic,
+  //       )),
+  // );
 
   @override
   void initState() {
-    // animtaion controller
-    _initAnimationController();
-
     super.initState();
   }
 
   @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Transform(
-      transform: Matrix4(
-        1, 0, 0, 0,
-        //
-        0, 1, 0, 0,
-        //
-        0, 0, 1, -0.001,
-        //
-        0, 0, 0, _currentAnim.value,
-        //
-      )
-        ..rotateX(widget.x)
-        ..rotateY(-(widget.y))
-        ..rotateZ(z),
-      alignment: FractionalOffset.center,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Image.asset(
-          '$PHOTO/main_profile.jpg',
-          key: widget.profileImageKey,
-          fit: BoxFit.contain,
-          width: 1600 / 2.5,
-          height: 900 / 2.5,
-        ),
-      ),
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return GestureDetector(
+          onTap: () async {
+            if (!isTriggered) {
+              await _animationController.forward();
+              setState(() {
+                isTriggered = true;
+              });
+            } else {
+              await _animationController.reverse();
+              setState(() {
+                isTriggered = false;
+              });
+            }
+          },
+          child: Transform(
+            transform: Matrix4(
+              1, 0, 0, 0,
+              //
+              0, 1, 0, 0,
+              //
+              0, 0, 1, -0.001,
+              //
+              0, 0, 0, 1,
+              //
+            )
+              ..rotateX(widget.x)
+              ..rotateY(
+                rotate.value - widget.y,
+                // 180 * pi / 180,
+              ),
+            alignment: FractionalOffset.center,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                '$PHOTO/main_profile.jpg',
+                key: widget.profileImageKey,
+                fit: BoxFit.contain,
+                width: 1600 / 2.5,
+                height: 900 / 2.5,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
