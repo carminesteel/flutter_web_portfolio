@@ -1,8 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_portfolio/common/utils.dart';
 import 'package:flutter_web_portfolio/components/mouse_coordinator.dart';
 import 'package:flutter_web_portfolio/constants/file_path.dart';
+import 'package:flutter_web_portfolio/provider/action_provider.dart';
+import 'package:provider/provider.dart';
 
 class InteractiveWidget extends StatefulWidget {
   const InteractiveWidget({
@@ -21,8 +24,9 @@ class InteractiveWidget extends StatefulWidget {
 }
 
 class _InteractiveWidgetState extends State<InteractiveWidget>
-    with SingleTickerProviderStateMixin {
-  bool isTriggered = false;
+    with TickerProviderStateMixin {
+  ActionProvider get _provider => context.read<ActionProvider>();
+  bool get isTriggered => context.read<ActionProvider>().isTriggered;
 
   //controller
   late final AnimationController _animationController = AnimationController(
@@ -31,7 +35,20 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
         milliseconds: 1000,
       ));
 
-  //spin 애니메이션
+  late final AnimationController _scaleAnimationController =
+      AnimationController(
+          vsync: this,
+          duration: const Duration(
+            milliseconds: 500,
+          ));
+
+  //scale
+  late final scale = Tween<double>(begin: 1, end: 3).animate(
+    CurvedAnimation(
+        parent: _scaleAnimationController, curve: Curves.easeOutExpo),
+  );
+
+  //spin
   late final rotate = Tween<double>(begin: 0, end: 3.14).animate(
     CurvedAnimation(
       parent: _animationController,
@@ -61,6 +78,30 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
   //       )),
   // );
 
+  Widget _buildFlippedContainer() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Colors.black38,
+      ),
+      width: 1600 / 2.5,
+      height: 900 / 2.5,
+    );
+  }
+
+  Widget _buildEntryContainer() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: Image.asset(
+        '$PHOTO/main_profile.jpg',
+        key: widget.profileImageKey,
+        fit: BoxFit.contain,
+        width: 1600 / 2.5,
+        height: 900 / 2.5,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,25 +110,23 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
   @override
   void dispose() {
     _animationController.dispose();
+    _scaleAnimationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _animationController,
+      animation:
+          Listenable.merge([_animationController, _scaleAnimationController]),
       builder: (context, child) {
         return GestureDetector(
           onTap: () async {
-            if (!isTriggered) {
-              await _animationController.forward();
-              setState(() {
-                isTriggered = true;
-              });
-            } else {
-              await _animationController.reverse();
-              setState(() {
-                isTriggered = false;
+            if (!_animationController.isAnimating && !_provider.isTriggered) {
+              _provider.switchTriggered();
+              _animationController.forward().then((_) {
+                //start expanding animation
+                _scaleAnimationController.forward();
               });
             }
           },
@@ -102,22 +141,15 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
               0, 0, 0, 1,
               //
             )
-              ..rotateX(widget.x)
+              ..rotateX(scale.value != 1.0 ? 0 : widget.x)
               ..rotateY(
-                rotate.value - widget.y,
-                // 180 * pi / 180,
-              ),
+                scale.value != 1.0 ? 0 : rotate.value - widget.y,
+              )
+              ..scale(scale.value),
             alignment: FractionalOffset.center,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                '$PHOTO/main_profile.jpg',
-                key: widget.profileImageKey,
-                fit: BoxFit.contain,
-                width: 1600 / 2.5,
-                height: 900 / 2.5,
-              ),
-            ),
+            child: (rotate.value - widget.y) > 1.7
+                ? _buildFlippedContainer()
+                : _buildEntryContainer(),
           ),
         );
       },

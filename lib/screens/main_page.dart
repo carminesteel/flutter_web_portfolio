@@ -4,6 +4,7 @@ import 'package:flutter_web_portfolio/common/fonts.dart';
 import 'package:flutter_web_portfolio/common/utils.dart';
 import 'package:flutter_web_portfolio/components/interactive_widget.dart';
 import 'package:flutter_web_portfolio/components/mouse_coordinator.dart';
+import 'package:flutter_web_portfolio/provider/action_provider.dart';
 
 import 'package:provider/provider.dart';
 
@@ -112,7 +113,8 @@ class _MainPageState extends State<MainPage>
         },
         child: Center(
             child: AnimatedScale(
-          scale: isHover ? 1.2 : 1.0,
+          scale:
+              isHover || context.read<ActionProvider>().isTriggered ? 1.2 : 1.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
           child: InteractiveWidget(
