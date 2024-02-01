@@ -4,9 +4,12 @@ import 'package:flutter_web_portfolio/firebase_options.dart';
 import 'package:flutter_web_portfolio/provider/action_provider.dart';
 import 'package:flutter_web_portfolio/screens/main_page.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
@@ -16,7 +19,8 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context ){
+
     return MaterialApp(
       title: 'Flutter Web Portfolio',
       theme: ThemeData(

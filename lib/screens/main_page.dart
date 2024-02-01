@@ -20,7 +20,7 @@ class _MainPageState extends State<MainPage>
   Size get screen => MediaQuery.of(context).size;
   bool clicked = false;
   GlobalKey profileImageKey = GlobalKey();
-  Offset _widgetCenterOffset = const Offset(0, 0);
+  Offset _widgetCenterOffset = Offset.zero;
 
   double x = 0;
   double y = 0;
@@ -64,6 +64,7 @@ class _MainPageState extends State<MainPage>
     );
   }
 
+  // 중간에 사용자가 창의 크기를 변경하는 경우 중앙 지점의 오프셋을 다시 계산하기 위함.
   void _setCenterOffset() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (profileImageKey.globalPaintBounds != null) {
@@ -72,11 +73,11 @@ class _MainPageState extends State<MainPage>
     });
   }
 
+  // 최초 실행시 중앙값 초기화.
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     _setCenterOffset();
-
     super.initState();
   }
 
@@ -86,6 +87,7 @@ class _MainPageState extends State<MainPage>
     super.dispose();
   }
 
+  // Metrics 의 변동을 감지하면 함수 실행.
   @override
   void didChangeMetrics() {
     _setCenterOffset();
@@ -97,6 +99,7 @@ class _MainPageState extends State<MainPage>
     return Scaffold(
       body: MouseCoordinator(
         onMouseHover: () {
+          // 마우스가 올려져 있는 동안 일정 영역 내에 진입한 경우 상태 변경
           if (x.abs() < 0.2 && y.abs() < 0.2) {
             setState(() {
               isHover = true;
@@ -107,6 +110,7 @@ class _MainPageState extends State<MainPage>
             });
           }
         },
+        // 마우스 포지션이 변경되면 위젯의 기울기를 즉각적으로 변경시키기 위함.
         onPositionChange: (offset) {
           x = ((_widgetCenterOffset - offset).dy) / 1000;
           y = ((_widgetCenterOffset - offset).dx) / 1000;
@@ -114,6 +118,7 @@ class _MainPageState extends State<MainPage>
         child: Center(
             child: AnimatedScale(
           scale:
+              // 마우스가 호버링중이거나 클릭을 한 상태면 스케일링 실행.
               isHover || context.read<ActionProvider>().isTriggered ? 1.2 : 1.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,

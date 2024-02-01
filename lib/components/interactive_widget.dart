@@ -15,6 +15,7 @@ class InteractiveWidget extends StatefulWidget {
     super.key,
   });
 
+  // 글로벌 키를 사용하여 위젯의 절대적인 위치를 파악하기 위함.
   final GlobalKey profileImageKey;
   final double x;
   final double y;
@@ -65,19 +66,7 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
     ),
   );
 
-  //width 애니메이션
-  // late final expandWidth =
-  //     Tween<double>(begin: 1600 / 2.5, end: MediaQuery.of(context).size.width)
-  //         .animate(
-  //   CurvedAnimation(
-  //       parent: _animationController,
-  //       curve: const Interval(
-  //         0.250,
-  //         0.500,
-  //         curve: Curves.easeOutCubic,
-  //       )),
-  // );
-
+  // 메인 프로필사진이 뒤집혔을 때 노출시킬 위젯.
   Widget _buildFlippedContainer() {
     return Container(
       decoration: BoxDecoration(
@@ -122,10 +111,10 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
       builder: (context, child) {
         return GestureDetector(
           onTap: () async {
+            // 클릭을 실시하면 뒤집히는 애니메이션 수행, 완료 후 확장되면서 라우팅을 실시.
             if (!_animationController.isAnimating && !_provider.isTriggered) {
               _provider.switchTriggered();
-              _animationController.forward().then((_) {
-                //start expanding animation
+              await _animationController.forward().then((_) {
                 _scaleAnimationController.forward();
               });
             }
@@ -141,10 +130,12 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
               0, 0, 0, 1,
               //
             )
+            // 마우스 포지션에 따라 약간 기울도록 처리한다.
               ..rotateX(scale.value != 1.0 ? 0 : widget.x)
               ..rotateY(
                 scale.value != 1.0 ? 0 : rotate.value - widget.y,
               )
+              // 스케일 처리.
               ..scale(scale.value),
             alignment: FractionalOffset.center,
             child: (rotate.value - widget.y) > 1.7
@@ -157,6 +148,7 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
   }
 }
 
+// 글로벌 키를 통해 현재 화면에서 렌더된 영역의 오프셋을 구한다.
 extension GlobalKeyExtension on GlobalKey {
   Rect? get globalPaintBounds {
     final renderObject = currentContext?.findRenderObject();
