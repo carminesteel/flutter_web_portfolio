@@ -5,6 +5,7 @@ import 'package:flutter_web_portfolio/common/utils.dart';
 import 'package:flutter_web_portfolio/components/mouse_coordinator.dart';
 import 'package:flutter_web_portfolio/constants/file_path.dart';
 import 'package:flutter_web_portfolio/provider/action_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class InteractiveWidget extends StatefulWidget {
@@ -114,9 +115,16 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
             // 클릭을 실시하면 뒤집히는 애니메이션 수행, 완료 후 확장되면서 라우팅을 실시.
             if (!_animationController.isAnimating && !_provider.isTriggered) {
               _provider.switchTriggered();
-              await _animationController.forward().then((_) {
-                _scaleAnimationController.forward();
+              // 뒤집기
+              await _animationController.forward();
+              // 확장하기
+              await  _scaleAnimationController.forward().then((_){
+                // 다음 화면으로 라우팅.
+                context.go(
+                    '/profile',
+                );
               });
+
             }
           },
           child: Transform(

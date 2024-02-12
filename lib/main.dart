@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_portfolio/firebase_options.dart';
 import 'package:flutter_web_portfolio/provider/action_provider.dart';
 import 'package:flutter_web_portfolio/screens/main_page.dart';
+import 'package:flutter_web_portfolio/screens/profile_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -16,19 +17,21 @@ void main() async {
 }
 
 final GoRouter _router = GoRouter(
+
   routes: <RouteBase>[
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const MainPage();
+        return ChangeNotifierProvider(
+            create: (context) => ActionProvider(), child: MainPage());
       },
       routes: <RouteBase>[
-        // GoRoute(
-        //   path: 'details',
-        //   builder: (BuildContext context, GoRouterState state) {
-        //     return const DetailsScreen();
-        //   },
-        // ),
+        GoRoute(
+          path: 'profile',
+          builder: (BuildContext context, GoRouterState state) {
+            return const ProfileScreen();
+          },
+        ),
       ],
     ),
   ],
