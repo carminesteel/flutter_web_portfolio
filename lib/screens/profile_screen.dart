@@ -58,44 +58,38 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:  Colors.black38,
-      body: AnimatedBuilder(
-        builder: (context, child) {
-          return Container(
-            width: 150,
-            height: 150,
-            color: animation.value,
-            child: AnimatedTextKit(
-              animatedTexts: [
-                TypewriterAnimatedText(
-                  'Hello world!',
-                  textStyle: const TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  speed: const Duration(milliseconds:300),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Scaffold(
+          backgroundColor:  animation.value,
+          body: AnimatedTextKit(
+            animatedTexts: [
+              TypewriterAnimatedText(
+                'Hello world!',
+                textStyle: const TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.bold,
                 ),
-                TypewriterAnimatedText(
-                  'TEST1234!',
-                  textStyle: const TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  speed: const Duration(milliseconds: 300),
-                )
-              ],
+                speed: const Duration(milliseconds:300),
+              ),
+              TypewriterAnimatedText(
+                'TEST1234!',
+                textStyle: const TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                speed: const Duration(milliseconds: 300),
+              )
+            ],
 
 
-              pause: const Duration(milliseconds: 1000),
-              displayFullTextOnTap: true,
-              stopPauseOnTap: true,
-            ),
-          );
-        },
-        animation: _controller,
-
-      ),
+            pause: const Duration(milliseconds: 1000),
+            displayFullTextOnTap: true,
+            stopPauseOnTap: true,
+          ),
+        );
+      },
     );
   }
 }
