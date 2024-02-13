@@ -4,6 +4,7 @@ import 'package:flutter_web_portfolio/firebase_options.dart';
 import 'package:flutter_web_portfolio/provider/action_provider.dart';
 import 'package:flutter_web_portfolio/screens/main_page.dart';
 import 'package:flutter_web_portfolio/screens/profile_screen.dart';
+import 'package:flutter_web_portfolio/util/transition.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -21,6 +22,7 @@ final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
+      name: 'home',
       builder: (BuildContext context, GoRouterState state) {
         return ChangeNotifierProvider(
             create: (context) => ActionProvider(), child: MainPage());
@@ -28,9 +30,13 @@ final GoRouter _router = GoRouter(
       routes: <RouteBase>[
         GoRoute(
           path: 'profile',
-          builder: (BuildContext context, GoRouterState state) {
-            return const ProfileScreen();
-          },
+          name : 'profile',
+          pageBuilder: (context, state) => buildPageWithoutTransition(
+            context: context,
+            state: state,
+            child: const ProfileScreen(),
+          ),
+
         ),
       ],
     ),
