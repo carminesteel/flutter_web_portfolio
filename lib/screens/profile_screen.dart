@@ -18,23 +18,37 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     TweenSequenceItem(
       weight: 1.0,
       tween: ColorTween(
-        begin: Colors.red,
-        end: Colors.green,
-      ) as Animatable<Color?>,
+        begin: Colors.grey,
+        end: Color(0xffFF6AD5),
+      ),
     ),
     TweenSequenceItem(
-      weight: 1.0,
+      weight: 1,
       tween: ColorTween(
-        begin: Colors.green,
-        end: Colors.blue,
-      ) as Animatable<Color?>,
+        begin: const Color(0xffFF6AD5),
+        end: const Color(0xffC774E8),
+      ),
     ),
     TweenSequenceItem(
-      weight: 1.0,
+      weight: 1,
       tween: ColorTween(
-        begin: Colors.blue,
-        end: Colors.pink,
-      ) as Animatable<Color?>,
+        begin: const Color(0xffC774E8),
+        end: const Color(0xffAD8CFF),
+      ),
+    ),
+    TweenSequenceItem(
+      weight: 1,
+      tween: ColorTween(
+        begin: const Color(0xffAD8CFF),
+        end: const Color(0xff8795E8),
+      ),
+    ),
+    TweenSequenceItem(
+      weight: 1,
+      tween: ColorTween(
+        begin: const Color(0xff8795E8),
+        end: const Color(0xff94D0FF),
+      ),
     ),
   ]).animate(_controller);
 
@@ -42,11 +56,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   void initState() {
     _controller = AnimationController(
         vsync: this,
-        duration: Duration(milliseconds: 1000),
+        duration: Duration(milliseconds:10000),
       value: 0.0,
       lowerBound: 0.0,
       upperBound: 1.0,
-    )..forward();
+    )..repeat(reverse: true);
     super.initState();
   }
 
