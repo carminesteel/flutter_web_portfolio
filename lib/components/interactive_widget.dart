@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_portfolio/common/colors.dart';
 import 'package:flutter_web_portfolio/common/utils.dart';
 import 'package:flutter_web_portfolio/components/mouse_coordinator.dart';
 import 'package:flutter_web_portfolio/constants/file_path.dart';
@@ -72,7 +73,7 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Colors.black38,
+        color: AppColor.toneGray,
       ),
       width: 1600 / 2.5,
       height: 900 / 2.5,
@@ -118,13 +119,12 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
               // 뒤집기
               await _animationController.forward();
               // 확장하기
-              await  _scaleAnimationController.forward().then((_){
+              await _scaleAnimationController.forward().then((_) {
                 // 다음 화면으로 라우팅.
                 context.go(
-                    '/profile',
+                  '/profile',
                 );
               });
-
             }
           },
           child: Transform(
@@ -138,7 +138,7 @@ class _InteractiveWidgetState extends State<InteractiveWidget>
               0, 0, 0, 1,
               //
             )
-            // 마우스 포지션에 따라 약간 기울도록 처리한다.
+              // 마우스 포지션에 따라 약간 기울도록 처리한다.
               ..rotateX(scale.value != 1.0 ? 0 : widget.x)
               ..rotateY(
                 scale.value != 1.0 ? 0 : rotate.value - widget.y,

@@ -38,8 +38,6 @@ class _MainPageState extends State<MainPage>
   };
   //////////////////////////////////////////////////////////////////////////////
 
-
-
   _textfield() {
     return TextField(
       onSubmitted: (value) async {
@@ -81,6 +79,7 @@ class _MainPageState extends State<MainPage>
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     _setCenterOffset();
+
     super.initState();
   }
 
